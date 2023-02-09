@@ -17,6 +17,8 @@ const fileInclude = require('gulp-file-include');
 const del = require('del');
 const notify = require('gulp-notify');
 const browserSync = require('browser-sync').create();
+// const jquery = require('jquery');
+// const ghPages = require('gulp-gh-pages');
 
 const srcPath = 'src/';
 const distPath = 'dist/';
@@ -56,9 +58,14 @@ function serve() {
     server: {
       baseDir: './' + distPath,
     },
+    browser: 'google chrome',
+    notify: false,
   });
 }
 
+function deploy() {
+  return gulp.src('./dist/**/*').pipe(ghPages());
+}
 function html() {
   return src(path.src.html, { base: srcPath })
     .pipe(plumber())
@@ -129,7 +136,7 @@ function images() {
       imagemin([
         imagemin.gifsicle({ interlaced: true }),
         imagemin.mozjpeg({ quality: 80, progressive: true }),
-        imagemin.optipng({ optimizationLevel: 5 }),
+        imagemin.optipng({ optimizationLevel: 2 }),
         imagemin.svgo({
           plugins: [{ removeViewBox: true }, { cleanupIDs: false }],
         }),
@@ -143,7 +150,6 @@ function fonts() {
     .pipe(dest(path.build.fonts))
     .pipe(browserSync.reload({ stream: true }));
 }
-
 function clean() {
   return del(path.clean);
 }
@@ -168,3 +174,4 @@ exports.clean = clean;
 exports.build = build;
 exports.watch = watch;
 exports.default = watch;
+exports.deploy = deploy;
